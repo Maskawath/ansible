@@ -1,0 +1,271 @@
+❎❌✅☑
+
+  ✅Starter✅
+================
+
+Install Ansible Alma Linux
+==========================
+sudo dnf install -y epel-release
+
+inventory
+=========
+/etc/ansible/hosts
+
+check user sudo previligae
+===========================
+sudo -l
+
+add user to sudoers   set nu:
+====================
+vi /etc/sudoers
+visudo 
+
+
+root	ALL=(ALL) 	ALL
+
+userList	Machine/System=All__Users All__Command
+
+pavel   ALL=(ALL [all user hisebe] ) /usr/sbin/useradd (command)
+
+
+whereis useradd
+===============
+
+check syntax error
+==================
+
+
+
+✅Install Ansible:
+==================
+yum install -y ansible
+ansible-doc -l 
+
+take help from a module
+=======================
+ansible-doc yum 
+
+Check version
+=============
+ansible --version
+config file: /etc/ansible/ansible.cfg
+
+check ansible packge version
+============================
+rpmquery ansible
+rpm -q ansible
+
+check ansible config file location
+===================================
+rpnquery ansible -c
+rpm -qc ansible
+
+Inventory file
+==============
+/etc/ansible/hosts   [ Managed host List ]
+
+View inventory file host list
+=============================
+ansible all --list-hosts
+
+Add hosts in inventory 
+======================
+ini or yaml
+open file : /etc/ansible/hosts
+
+servera 
+serverb
+serverc
+
+save and exit
+======/|\===== 
+
+Listong the hosts:
+==================
+ansible servera,serverb --list-hosts
+ansible '*' --list-hosts
+ansible ungrouped --list-hosts  [See ungrouped list hosts in inventory]
+
+make server group in inventory file
+===================================
+open file : /etc/ansible/hosts
+
+serverx
+[web]
+servera
+serverb
+
+[db]
+serverc
+serverd
+
+save and exit
+======/|\===== 
+
+ansible db --list-hosts
+
+View in JASON Format
+====================
+ansible-inventory all --list
+
+
+Add children in inventory file
+==============================
+open file : /etc/ansible/hosts
+
+serverx
+[web]
+servera
+serverb
+
+[db]
+serverc
+serverd
+
+# make children
+
+[webdb:children]
+web
+db
+
+[webdb]
+serverf
+
+[windows]
+desktop[1:10:2]
+
+save and exit
+======/|\===== 
+
+
+=====================
+✅CLASS 03 ANSIBLE✅
+=======/_|_\=========
+
+ansible --version
+
+Config file first preference:
+
+First Preference:
+================
+Env Variable
+# export ANSIBLE_CONFIG=/opt/ansible.cfg
+# env | grep -i ansible
+
+Make Environment variable Permanent
+
+vi .bashrc
+
+# export ANSIBLE_CONFIG=/opt/ansible.cfg
+
+Save & Exit.
+
+Make Source: 
+============
+.bashrc execute when user login
+# source .bashrc or . ./bashrc
+
+Second Preference:
+==================
+Current Working Directory: ansible.cfg
+
+Third Preference:
+=================
+Users home dir: File name: .ansible.cfg
+
+Fourth Preference
+=================
+/etc/ansible/ansible.cfg
+
+Ansible default inventory file path:
+====================================
+vi /etc/ansible/hosts
+
+# ansible all --list-hosts
+# ansible  '*' --list-hosts
+
+View Modules:
+=============
+# ansible-doc -l | wc -l
+# ansible-doc -l | grep ping
+
+Ad-hoc command
+==============
+ansible [-i inventory] [servers] [-m module] {-a module_options}
+# ansible servera -m module {-a module_options}
+# ansible servera -m ping 
+
+Cntrol node to managed node ------> SSH
+
+# ansible -m ping 
+
+/etc/ansible/ansible.cfg ---------> All Configurations are there
+
+/remote_user = root	    ------> on the managed host 
+
+# ansible --help
+# -c [ dry run or check ]
+# --ask-pass [ Ask for connection password ]
+# --user or -u
+# ssh root@servera -o preferredauthentication=password
+
+# I want to use password base Auth in managed machine. When to connect remote machine
+it will want my passwrd.  
+
+✔ Remote connection method: key base or password base ]
+=======================================================
+# ansible servera -m ping --ask-pass or [-k]
+
+✔ Provide user name during connect to remote machine:
+======================================================
+# ansible servera -m ping -u pavel --ask-pass
+
+✔ Set password with echo
+=========================
+# echo redhat | passwd --stdin ansi1
+
+✅ wnat to execute commnad but do want to provide passsword everytime ✅
+
+✅ Task: From workstation machine with ansi user want to check uptime in servera:
+
+# ansible servera -m command -a uptime
+# ansible servera -m command -a whoamo
+
+- servera    => host
+- -m commnad => module to use
+- -a uptime  => argument 
+
+# ansible --help | grep -i become
+# ansible servera "yum install vim -y" --become --ask-become-pass
+
+Her we can avoid --become by change configuration in \etc\ansible\ansible.cfg
+# become=True
+
+✅Now using yum module✅
+
+# ansible servera -m yum "name=httpd state=absent"
+
+====================
+✅CLASS 05 ANSIBLE✅
+=======/_|_\========
+# ansible-inventory --list -y
+# ansible all -m ping -u root
+pre Confogure Script:
+
+vim pre.sh
+==========
+useradd devops1
+echo redhat | passwd --stdin devops1
+
+cat <<EOF >> /etc/sudoers.d/devops1
+
+ devops1 ALL = (ALL) NOPASSWD:ALL
+
+EOF
+
+# grep wheel /etc/sudoers
+scp pre.sh root@servera:/root/
+scp pre.sh root@serverb:/root/
+scp pre.sh root@serverc:/root/
+
+ssh root@servera "bash /root/pre.sh"
