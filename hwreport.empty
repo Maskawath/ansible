@@ -1,0 +1,5 @@
+hostname=inventoryhostname
+memory=memory_in_MB
+bios_version=BIOS_version
+sda_size=disk_sda_size
+sdb_size=disk_sdb_size
